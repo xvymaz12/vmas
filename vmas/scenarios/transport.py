@@ -111,6 +111,12 @@ class Scenario(BaseScenario):
 
         for package in self.packages:
             package.on_goal = self.world.is_overlapping(package, package.goal)
+            sum=0
+            for agentos in self.world.agents:
+                    obs = torch.linalg.vector_norm(
+                        package.state.pos - agentos.state.pos, dim=1
+                    )
+                    sum = sum+obs
 
             if env_index is None:
                 package.global_shaping = (
@@ -118,14 +124,14 @@ class Scenario(BaseScenario):
                         package.state.pos - package.goal.state.pos, dim=1
                     )
                     * self.shaping_factor
-                )
+                ) + sum
             else:
                 package.global_shaping[env_index] = (
                     torch.linalg.vector_norm(
                         package.state.pos[env_index] - package.goal.state.pos[env_index]
                     )
                     * self.shaping_factor
-                )
+                )+sum
 
     def reward(self, agent: Agent):
         is_first = agent == self.world.agents[0]
@@ -141,6 +147,12 @@ class Scenario(BaseScenario):
                 package.dist_to_goal = torch.linalg.vector_norm(
                     package.state.pos - package.goal.state.pos, dim=1
                 )
+                sum=0
+                for agentos in self.world.agents:
+                    obs = torch.linalg.vector_norm(
+                        package.state.pos - agentos.state.pos, dim=1
+                    )
+                    sum = sum+obs
                 package.on_goal = self.world.is_overlapping(package, package.goal)
                 package.color = torch.tensor(
                     Color.RED.value,
@@ -156,9 +168,9 @@ class Scenario(BaseScenario):
                 package_shaping = package.dist_to_goal * self.shaping_factor
                 self.rew[~package.on_goal] += (
                     package.global_shaping[~package.on_goal]
-                    - package_shaping[~package.on_goal]
+                    - package_shaping[~package.on_goal] - obs
                 )
-                package.global_shaping = package_shaping
+                package.global_shaping = package_shaping+obs
 
         return self.rew
 
