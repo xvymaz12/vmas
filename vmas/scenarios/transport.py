@@ -20,7 +20,7 @@ class Scenario(BaseScenario):
         self.package_mass = kwargs.pop("package_mass", 50)
         ScenarioUtils.check_kwargs_consumed(kwargs)
 
-        self.shaping_factor = 100
+        self.shaping_factor = 10000
         self.world_semidim = 1
         self.agent_radius = 0.03
 
