@@ -168,7 +168,7 @@ class Scenario(BaseScenario):
                 package_shaping = package.dist_to_goal * self.shaping_factor
                 self.rew[~package.on_goal] += (
                     package.global_shaping[~package.on_goal]
-                    - package_shaping[~package.on_goal] - obs
+                    - package_shaping[~package.on_goal] - obs[~package.on_goal]
                 )
                 package.global_shaping = package_shaping+obs
 
